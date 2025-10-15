@@ -1,4 +1,4 @@
-# JWT Hardening Assignment - Secure Software Development
+# JWT Hardening
 
 ## Overview
 This project hardens a vulnerable Node.js + Express + SQLite JWT authentication lab to follow secure authentication practices. Starting from the provided vulnerable demo, it moves configuration to a `.env` file, enforces `iss`/`aud` claims and short token lifetimes, removes hard-coded secrets, implements a refresh strategy with rotation and server-side storage, and demonstrates attacks (e.g., weak secret forgery, `alg:none` trick) that succeed on the vulnerable server but fail on the hardened one. Postman is used for requests, and Wireshark for traffic inspection.
