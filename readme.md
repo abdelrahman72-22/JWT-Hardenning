@@ -11,6 +11,25 @@ The existing frontend is reused with minimal edits (e.g., `credentials: 'include
 - **E:** Logging for failures + `scan-logs.js` for detection.
 
 **Token Lifetimes:** Access: 15 minutes. Refresh: 7 days (rotated on use).
+##  Create self-signed cert (OpenSSL)
+
+```bash
+mkdir certs
+cd certs
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr    # Common Name: http://localhost:1235
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+```
+
+Place server.key and server.crt in certs/.
+
+---
+
+## Trust certificate in Windows
+
+Run mmc.exe → Add Snap-in → Certificates → Computer account → Trusted Root Certification Authorities → Import certs/server.crt.
+
+---
 
 ## Setup Instructions
 1. Clone or download the provided project to your local machine.
@@ -25,13 +44,8 @@ The existing frontend is reused with minimal edits (e.g., `credentials: 'include
    ```
    This creates `users.db` with sample users: alice/alicepass (role: user), admin/adminpass (role: admin).
 5. Copy `.env.example` to `.env` and populate with secure values (see Environment Configuration below).
-6. (Bonus A) Generate self-signed certs for HTTPS (if `/certs/` missing):
-   ```
-   mkdir certs
-   openssl req -x509 -newkey rsa:4096 -keyout certs/server.key -out certs/server.crt -days 365 -nodes -subj "/CN=localhost"
-   ```
-   Trust locally in browser/OS for no warnings.
-7. Start the vulnerable server (follow repo README; example):
+   
+6. Start the vulnerable server (follow repo README; example):
    ```
    npm start
    ```
@@ -62,7 +76,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Example: `14f11c5f93370d13d5ff747ee30c9da7a98d35cff2f82a4995fc07ad26efbc35`. Never commit `.env` to Git.
 
 ## Remove Hard-Coded / Weak Secrets (Required)
-- Replace any hard-coded weak secret (e.g., `WEAK_SECRET`) with `process.env` values from `.env`.
+- Replace any hard-coded weak secret (e.g., `weak-secret`) with `process.env` values from `.env`.
 - Explain how you generated the secrets (e.g., `crypto.randomBytes(...)` or a secure generator) in README.
 
 All secrets (ACCESS_SECRET, REFRESH_SECRET, VULN_SECRET) are now loaded from `.env` via `dotenv`. No hard-coded values remain in source code. Generation method detailed above.
@@ -138,7 +152,7 @@ Postman collections: `postman/jwt-vuln.json` (vulnerable), `postman/jwt-secure.j
 
 **Filters:**
 - HTTP (Vuln): `http or tcp.port == 1234`
-- HTTPS (Hardened): `tcp.port == 1235`
+- HTTPS (Hardened): `tcp.port == 1235 or tls`
 
 **Visibility:**
 - HTTP: Token in cleartext Authorization header (follow stream → decode payload/user/role).
