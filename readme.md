@@ -144,18 +144,4 @@ Postman collections: `postman/jwt-vuln.json` (vulnerable), `postman/jwt-secure.j
 - HTTP: Token in cleartext Authorization header (follow stream → decode payload/user/role).
 - HTTPS (Bonus A): TLS-encrypted; no cleartext (follow stream → obfuscated bytes).
 
-## Bonus (Extra Credit - Optional)
-All implemented; documented in Overview.
-
-- **A:** HTTPS locally—run with self-signed cert (instructions above); Wireshark shows encryption.
-- **B:** Helmet & secure headers—`app.use(helmet())`; applies CSP, HSTS, X-Frame-Options, etc. (check response headers).
-- **C:** Rate limiting—`express-rate-limit` on /login; 5 max/15min, logs IP, returns 429.
-- **D:** Persistent refresh-store—SQLite table for rotation/revocation; survives restarts (CASCADE delete).
-- **E:** Logging & detection—Console logs failures (e.g., [Auth Failed] IP/time). Scan: `node scan-logs.js` on `server.log` (alerts: 5+ failed logins/IP/60min, etc.).
-
-## Deliverables Notes
-- Modified project code: `secure-server.js` (hardened), `.env.example`, scripts (`forge_attack.js`, `scan-logs.js`), Postman collections.
-- README.md: As above.
-- Short screencast (≤3min): Shows `.env.example`; vuln attack (Postman); hardened rejection; Wireshark HTTP vs. HTTPS; explains changes (e.g., "Enforced claims prevent forgery; rotation blocks replays").
-
 **Assumptions & Limitations:** Assumes original `vuln-server.js`; single-server (no distributed sessions); tested Node 20/macOS. No production use—strengthen keys further.
